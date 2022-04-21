@@ -6,17 +6,19 @@ from Pages.PageObject import PageObject
 
 class ProductsPage(PageObject):
     url = 'https://www.saucedemo.com/inventory.html'
-    txt_title_products = 'PRODUCTS'
-    class_title = 'title'
+    txt_page_title = 'PRODUCTS'
+    class_page_title = 'title'
+    id_btn_menu = 'react-burger-menu-btn'
 
     def __init__(self, driver):
-        super(ProductsPage, self).__init__(driver)
+        super(ProductsPage, self).__init__(driver=driver)
 
     def is_products_page(self):
-        is_products_url = self.driver.current_url == self.url
         try:
-            title_page = self.driver.find_element(By.CLASS_NAME, self.class_title).text
-            is_products_title = title_page.upper() == self.txt_title_products
+            # Página de título do elemento
+            element_class_title = self.driver.find_element(By.CLASS_NAME, self.class_page_title)
+            # Verificar se o menu existe.
+            element_menu = self.driver.find_element(By.ID, self.id_btn_menu)
+            return element_class_title.text == self.txt_page_title and element_menu
         except NoSuchElementException:
-            is_products_title = False
-        return is_products_url and is_products_title
+            return False

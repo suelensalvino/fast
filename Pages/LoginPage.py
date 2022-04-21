@@ -1,39 +1,46 @@
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.chrome.service import Service
+import time
+
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 from Pages.PageObject import PageObject
 
 class LoginPage(PageObject):
-    url = 'https://www.saucedemo.com/'
-    id_login_btn = 'login-button'
-    class_error_msg = 'error-message-container'
-    txt_error_login_message = 'Epic sadface: Username is required'
-    id_username = 'user-name'
-    id_password = 'password'
+    URL_LOGIN = "https://www.saucedemo.com/"
+    # Page Elements
+    id_btn_login = 'login-button'
+    class_error_login_msg = 'error-message-container'
+    txt_msg_login_error = 'Epic sadface: Username is required'
+    txt_standard_user = 'standard_user'
+    txt_password_all_users = 'secret_sauce'
 
-    def __init__(self):
-        super(LoginPage, self).__init__()
-        self.driver.get(self.url)
+    def __init__(self, browser):
+        # Abrir browser
+        super(LoginPage, self).__init__(browser=browser)
+        # Abrir URL de login
+        self.open_login_url()
 
-    def click_login_button(self):
-        self.driver.find_element(By.ID, self.id_login_btn).click()
+    def open_login_url(self):
+        # Abrir URL login
+        self.driver.get(self.URL_LOGIN)
 
-    def is_login_page(self):
-        is_url_login = self.driver.current_url == self.url
-        try:
-            login_btn = self.driver.find_element(By.ID, self.id_login_btn)
-        except NoSuchElementException:
-            login_btn = False
+    def click_btn_login(self):
+        # Procurar e clicar no botão "login"
+        self.driver.find_element(By.ID, self.id_btn_login).click()
 
-        return is_url_login and login_btn
+    def is_url_login_page(self):
+        return self.driver.current_url == self.URL_LOGIN
 
-    def has_login_message_error(self):
-        error_msg = self.driver.find_element(By.CLASS_NAME, self.class_error_msg).text
-        return error_msg == self.txt_error_login_message
+    def has_login_msg_error(self):
+        error_message = self.driver.find_element(By.CLASS_NAME, self.class_error_login_msg).text
+        return error_message == self.txt_msg_login_error, "Mensagem de erro incorreta!"
 
-    def make_login(self, user_name='standard_user', password='secret_sauce'):
-        self.driver.find_element(By.ID, self.id_username).send_keys(user_name)
-        self.driver.find_element(By.ID, self.id_password).send_keys(password)
-        self.click_login_button()
+    def execute_login(self, username=None, password=None):
+        # Se username ou password forem 'None' usar username e password padrão para login.
+        if not username:
+            username = self.txt_standard_user
+        if not password:
+            password = self.txt_password_all_users
+        # Inserir username e password
+        self.driver.find_element(By.ID, 'user-name').send_keys(username)
+        self.driver.find_element(By.ID, 'password').send_keys(password)
+        # Procurar e clicar no botão "login"
+        self.click_btn_login()
